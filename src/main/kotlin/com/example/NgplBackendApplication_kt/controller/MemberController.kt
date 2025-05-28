@@ -13,7 +13,7 @@ class MemberController(
     private val memberService: MemberService
 ) {
 
-    @PostMapping("/test")
+    @GetMapping("/test")
     fun test(): ApiResponse<Any?> {
         return ApiResponse.success(
             status = Status.OK.code.toString(),
@@ -27,10 +27,18 @@ class MemberController(
         if (req == null) throw GeneralException(Status.BAD_REQUEST)
 
         val isValidate = memberService.validatePassword(req)
-        return ApiResponse.success(
-            status = Status.OK.code.toString(),
-            message = Status.OK.message,
-            data = isValidate
+
+        return if (isValidate)
+            ApiResponse.success(
+                status = Status.OK.code.toString(),
+                message = Status.OK.message,
+                data = null
+            )
+        else
+            ApiResponse.onFailure(
+            status = Status.BAD_REQUEST.code.toString(),
+            message = "검증을 요청한 비밀번호가 유효하지 않습니다.",
+            data = null
         )
     }
 }
